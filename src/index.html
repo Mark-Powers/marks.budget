@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Mark's Budget</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <!-- <script src="https://cdn.jsdelivr.net/npm/vue"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="main.js"></script>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+
+<body>
+    <h1>Mark's Budget</h1>
+    <div id="data">
+        <div>
+            <button v-bind:class="{ bold: activeTab == 0 }" v-on:click="setTab(0)">Ledger</button>
+            <button v-bind:class="{ bold: activeTab == 1 }" v-on:click="setTab(1)">Summary</button>
+        </div>
+
+        <!-- Ledger -->
+        <div v-if="activeTab == 0">
+            <div class="newItem">
+                <input v-model="m.when" placeholder="Date" type="date">
+                <input v-model="m.where" placeholder="Where">
+                <input v-model="m.amount" placeholder="Amount" type="number" step="0.01">
+                <input v-model="m.category" placeholder="Category">
+                <input v-model="m.subcategory" placeholder="Subcategory">
+                <button v-on:click="post(m, '/transaction')">Add</button>
+            </div>
+            <table class="table">
+                <tr class="table-header">
+                    <th class="table-index"></th>
+                    <th>Date</th>
+                    <th>Where</th>
+                    <th>Amount</th>
+                    <th>Category</th>
+                    <th>Subcategory</th>
+                    <th></th>
+                </tr>
+                <tr v-for="(transaction, i) in transactions">
+                    <td class="table-index">{{i+1}}</td>
+                    <td>{{transaction.when.substring(0,10)}}</td>
+                    <td>{{transaction.where}}</td>
+                    <td>{{transaction.amount}}</td>
+                    <td>{{transaction.category}}</td>
+                    <td>{{transaction.subcategory}}</td>
+                    <td>
+                        <button v-on:click="prepareEntryEdit(transaction)">&#9881;</button>
+                        <button v-on:click="remove(transaction)">X</button>
+                    </td>
+                </tr>
+
+            </table>
+        </div v-if="activeTab == 0">
+
+        <table v-if="activeTab == 10">
+            <tr>
+                <th></th>
+                <th>Date</th>
+                <th>Where</th>
+                <th>Amount</th>
+                <th>Category</th>
+                <th>Subcategory</th>
+
+            </tr>
+            <tr>
+                <td></td>
+                <td>
+                    <input v-model="em.when" placeholder="Date" type="date">
+                </td>
+                <td>
+                    <input v-model="em.where" placeholder="Where">
+                </td>
+                <td>
+                    <input v-model="em.amount" placeholder="Amount" type="number" step="0.01">
+                </td>
+                <td>
+                    <input v-model="em.category" placeholder="Category">
+                </td>
+                <td>
+                    <input v-model="em.subcategory" placeholder="Subcategory">
+                </td>
+                <td><button v-on:click="updateMany(em);activeTab=0;">Update</button></td>
+            </tr>
+        </table>
+
+        <!-- Summary -->
+        <div v-if="activeTab == 1">
+            <div class="summary-panel">
+                <h2>Weekly</h2>
+                <table class="table">
+                    <tr>
+                        <th>Year</th>
+                        <th>Week</th>
+                        <th>In</th>
+                        <th>Out</th>
+                        <th>Net</th>
+                    </tr>
+                    <tr v-for="(data, i) in summary.week">
+                        <td>{{data.y}}</td>
+                        <td>{{data.w}}</td>
+                        <td>{{data.in}}</td>
+                        <td>{{data.out}}</td>
+                        <td v-bind:class="{'net-negative': data.negative, 'net-positive':data.positive}">{{data.net}}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="summary-panel">
+                <h2>Monthly</h2>
+                <table class="table">
+                    <tr>
+                        <th>Year</th>
+                        <th>Month</th>
+                        <th>In</th>
+                        <th>Out</th>
+                        <th>Net</th>
+                    </tr>
+                    <tr v-for="(data, i) in summary.month">
+                        <td>{{data.y}}</td>
+                        <td>{{data.m}}</td>
+                        <td>{{data.in}}</td>
+                        <td>{{data.out}}</td>
+                        <td v-bind:class="{'net-negative': data.negative, 'net-positive':data.positive}">{{data.net}}
+                        </td v-bind:class="{'net-negative': data.negative, 'net-positive':data.positive}">
+                    </tr>
+                </table>
+            </div>
+            <div class="summary-panel">
+                <h2>Yearly</h2>
+                <table class="table">
+                    <tr>
+                        <th>Year</th>
+                        <th>In</th>
+                        <th>Out</th>
+                        <th>Net</th>
+                    </tr>
+                    <tr v-for="(data, i) in summary.year">
+                        <td>{{data.y}}</td>
+                        <td>{{data.in}}</td>
+                        <td>{{data.out}}</td>
+                        <td v-bind:class="{'net-negative': data.negative, 'net-positive':data.positive}">{{data.net}}
+                        </td v-bind:class="{'net-negative': data.negative, 'net-positive':data.positive}">
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

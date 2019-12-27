@@ -1,0 +1,72 @@
+td {
+    border: 1px solid lightgrey;
+    min-width: 3em;
+}
+
+table {
+    max-width: 100%;
+}
+
+li {
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+tr:nth-child(2n+1) {
+    background-color: lightgray;
+}
+tr {
+    width: 100%;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+#data {
+    width: 100%;
+}
+
+.border {
+    border: 1px solid lightgrey;
+}
+
+textarea {
+    border-radius: 4px;
+    width: 60%;
+    height: 10em;
+    display: block;
+}
+
+pre {
+    white-space: pre-line;
+}
+
+.net-negative {
+    /* color: red; */
+    background-color: lightcoral;
+}
+.net-positive {
+    /* color: green; */
+    background-color: lightgreen
+}
+.summary-panel {
+    float:left;
+    padding-right: 2em;
+}
+@media only screen and (max-width: 600px) {
+    .newItem td {
+        display:block;
+    }
+    .table-index {
+        display: none;
+    }
+    button {
+        font-size: 32px;
+    }
+    input {
+        font-size: 32px;
+        display: block;
+        width: 100%;
+    }
+}
