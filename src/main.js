@@ -4,7 +4,7 @@ window.onload = function () {
         data: {
             activeTab: 0,
             transactions: [],
-            summary: {},
+            summary: {username : ""},
             selTodoType: "all",
         },
         methods: {
@@ -173,6 +173,8 @@ window.onload = function () {
                     this.summary.year.sort(function(a, b){
                         return a.y-b.y;
                     })
+
+                    this.summary.username = response.username
                 });
         },
         computed: {

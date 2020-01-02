@@ -67,6 +67,10 @@ function setUpModels() {
         type: Sequelize.STRING,
         allowNull: false,
       },
+      username: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
     }),
     "users": database.define('user', {
       username: {

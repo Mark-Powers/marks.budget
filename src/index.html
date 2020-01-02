@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <title>Mark's Budget</title>
+    <title>Budget</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="shortcut icon" href="/favicon.ico">
@@ -13,8 +13,8 @@
 </head>
 
 <body>
-    <h1>Mark's Budget</h1>
     <div id="data">
+        <h1 v-if="summary.username">{{summary.username}}'s budget</h1>
         <div>
             <button v-bind:class="{ bold: activeTab == 0 }" v-on:click="setTab(0)">Ledger</button>
             <button v-bind:class="{ bold: activeTab == 1 }" v-on:click="setTab(1)">Summary</button>
@@ -54,7 +54,7 @@
                 </tr>
 
             </table>
-        </div v-if="activeTab == 0">
+        </div>
 
         <table v-if="activeTab == 10">
             <tr>

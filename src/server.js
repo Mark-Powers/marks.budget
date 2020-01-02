@@ -25,7 +25,7 @@ function hashWithSalt(password, salt){
 
 function setUpRoutes(models, jwtFunctions, database) {
     // Authentication routine
-    server.use(function (req, res, next) {
+    server.use(async function (req, res, next) {
         if (!req.path.toLowerCase().startsWith("/login")) {
             let cookie = req.cookies.authorization
             if (!cookie) {
@@ -35,15 +35,16 @@ function setUpRoutes(models, jwtFunctions, database) {
             }
             try {
                 const decryptedUserId = jwtFunctions.verify(cookie);
-                models.users.findOne({ where: { username: decryptedUserId } }).then((user, error) => {
-                    if (user) {
-                        res.locals.user = user.get({ plain: true });
-                    } else {
-                        console.debug("Redirecting to login - invalid cookie")
-                        res.redirect('/login');
-                        return;
-                    }
-                });
+                var user = await models.users.findOne({ where: { username: decryptedUserId } });
+                // .then((user, error) => {
+                if (user) {
+                    res.locals.user = user.get({ plain: true });
+                } else {
+                    console.debug("Redirecting to login - invalid cookie")
+                    res.redirect('/login');
+                    return;
+                }
+                // });
             } catch (e) {
                 res.status(400).send(e.message);
             }
@@ -78,7 +79,7 @@ function setUpRoutes(models, jwtFunctions, database) {
 
     server.get(`/transaction`, async (req, res, next) => {
         try {
-            var result = await database.query("SELECT * FROM transactions ORDER BY `when` DESC", { type: database.QueryTypes.SELECT })
+            var result = await database.query("SELECT * FROM transactions WHERE username = '" + res.locals.user.username + "' ORDER BY `when` DESC", { type: database.QueryTypes.SELECT })
             res.status(200).send(result);
             next();
         } catch (e) {
@@ -90,8 +91,9 @@ function setUpRoutes(models, jwtFunctions, database) {
         try {
             let item = req.body;
             console.log(item);
+            item.username = res.locals.user.username
             await models.transaction.create(item);
-            var result = await database.query("SELECT * FROM transactions ORDER BY `when` DESC", { type: database.QueryTypes.SELECT })
+            var result = await database.query("SELECT * FROM transactions WHERE username = '" + res.locals.user.username + "' ORDER BY `when` DESC", { type: database.QueryTypes.SELECT })
             res.status(200).send(result);
         } catch (e) {
             console.log(e);
@@ -102,8 +104,8 @@ function setUpRoutes(models, jwtFunctions, database) {
         try {
             let id = req.body.id;
             console.log(`Deleting ${id}`);
-            await models.transaction.destroy({ where: { id: id } });
-            var result = await database.query("SELECT * FROM transactions ORDER BY `when` DESC", { type: database.QueryTypes.SELECT })
+            await models.transaction.destroy({ where: { id: id, username: res.locals.user.username } });
+            var result = await database.query("SELECT * FROM transactions WHERE username = '" + res.locals.user.username + "' ORDER BY `when` DESC", { type: database.QueryTypes.SELECT })
             res.status(200).send(result);
         } catch (e) {
             console.log(e);
@@ -115,11 +117,11 @@ function setUpRoutes(models, jwtFunctions, database) {
             let id = req.body.id;
             let update = req.body.update;
             console.log(`Updating ${id}`);
-            var toUpdate = await models.transaction.findOne({ where: { id: id } });
+            var toUpdate = await models.transaction.findOne({ where: { id: id, username:res.locals.user.username } });
             console.log(toUpdate)
             console.log(update)
             await toUpdate.update(update);
-            var result = await database.query("SELECT * FROM transactions ORDER BY `when` DESC", { type: database.QueryTypes.SELECT })
+            var result = await database.query("SELECT * FROM transactions WHERE username = '" + res.locals.user.username + "' ORDER BY `when` DESC", { type: database.QueryTypes.SELECT })
             res.status(200).send(result);
         } catch (e) {
             console.log(e);
@@ -130,20 +132,21 @@ function setUpRoutes(models, jwtFunctions, database) {
         try {
             res.status(200).send({
                 week: {
-                    out: await database.query("SELECT year(`when`) as y, week(`when`) as w, sum(amount) as s FROM transactions where amount > 0 group by year(`when`), WEEK(`when`);", { type: database.QueryTypes.SELECT }),
-                    in: await database.query("SELECT year(`when`)as y,   week(`when`) as w, sum(amount) as s FROM transactions where amount < 0 group by year(`when`), WEEK(`when`);", { type: database.QueryTypes.SELECT }),
-                    net: await database.query("SELECT year(`when`) as y, week(`when`) as w, sum(amount) as s FROM transactions group by year(`when`), WEEK(`when`);", { type: database.QueryTypes.SELECT }),
+                    out: await database.query("SELECT year(`when`) as y, week(`when`) as w, sum(amount) as s FROM transactions where username = '" + res.locals.user.username + "' and amount > 0 group by year(`when`), WEEK(`when`);", { type: database.QueryTypes.SELECT }),
+                    in: await database.query("SELECT year(`when`)as y,   week(`when`) as w, sum(amount) as s FROM transactions where username = '" + res.locals.user.username + "' and amount < 0 group by year(`when`), WEEK(`when`);", { type: database.QueryTypes.SELECT }),
+                    net: await database.query("SELECT year(`when`) as y, week(`when`) as w, sum(amount) as s FROM transactions where username = '" + res.locals.user.username + "' group by year(`when`), WEEK(`when`);", { type: database.QueryTypes.SELECT }),
                 },
                 month: {
-                    out: await database.query("SELECT year(`when`) as y, month(`when`) as m, sum(amount) as s FROM transactions where amount > 0 group by year(`when`), month(`when`);", { type: database.QueryTypes.SELECT }),
-                    in: await database.query("SELECT year(`when`)  as y, month(`when`) as m, sum(amount) as s FROM transactions where amount < 0 group by year(`when`), month(`when`);", { type: database.QueryTypes.SELECT }),
-                    net: await database.query("SELECT year(`when`) as y, month(`when`) as m, sum(amount) as s FROM transactions group by year(`when`), month(`when`);", { type: database.QueryTypes.SELECT }),
+                    out: await database.query("SELECT year(`when`) as y, month(`when`) as m, sum(amount) as s FROM transactions where username = '" + res.locals.user.username + "' and amount > 0 group by year(`when`), month(`when`);", { type: database.QueryTypes.SELECT }),
+                    in: await database.query("SELECT year(`when`)  as y, month(`when`) as m, sum(amount) as s FROM transactions where username = '" + res.locals.user.username + "' and amount < 0 group by year(`when`), month(`when`);", { type: database.QueryTypes.SELECT }),
+                    net: await database.query("SELECT year(`when`) as y, month(`when`) as m, sum(amount) as s FROM transactions where username = '" + res.locals.user.username + "' group by year(`when`), month(`when`);", { type: database.QueryTypes.SELECT }),
                 },
                 year: {
-                    out: await database.query("SELECT year(`when`) as y, sum(amount) as s FROM transactions where amount > 0 group by year(`when`);", { type: database.QueryTypes.SELECT }),
-                    in: await database.query("SELECT year(`when`)  as y, sum(amount) as s FROM transactions where amount < 0 group by year(`when`);", { type: database.QueryTypes.SELECT }),
-                    net: await database.query("SELECT year(`when`) as y, sum(amount) as s FROM transactions group by year(`when`);", { type: database.QueryTypes.SELECT }),
+                    out: await database.query("SELECT year(`when`) as y, sum(amount) as s FROM transactions where username = '" + res.locals.user.username + "' and amount > 0 group by year(`when`);", { type: database.QueryTypes.SELECT }),
+                    in: await database.query("SELECT year(`when`)  as y, sum(amount) as s FROM transactions where username = '" + res.locals.user.username + "' and amount < 0 group by year(`when`);", { type: database.QueryTypes.SELECT }),
+                    net: await database.query("SELECT year(`when`) as y, sum(amount) as s FROM transactions where username = '" + res.locals.user.username + "' group by year(`when`);", { type: database.QueryTypes.SELECT }),
                 },
+                username: res.locals.user.username
             });
             next();
         } catch (e) {
