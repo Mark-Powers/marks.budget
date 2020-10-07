@@ -90,6 +90,24 @@ function setUpModels() {
         allowNull: false,
       }
     }),
+    "expected": database.define('expected', {
+      username: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      name: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      total: {
+        type: Sequelize.DECIMAL,
+        allowNull: false,
+      }, 
+      days: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+      }
+    }),
     "users": database.define('user', {
       username: {
         type: Sequelize.STRING,

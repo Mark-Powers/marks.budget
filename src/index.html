@@ -16,20 +16,21 @@
     <div id="data">
         <h1 v-if="summary.username">{{summary.username}}'s budget</h1>
         <div>
-            <button v-bind:class="{ bold: activeTab == 0 }" v-on:click="setTab(0)">Ledger</button>
-            <button v-bind:class="{ bold: activeTab == 1 }" v-on:click="setTab(1)">Summary</button>
-            <button v-bind:class="{ bold: activeTab == 2 }" v-on:click="setTab(2)">Goals</button>
+            <button v-bind:class="{ bold: activeTab == 'ledger' }" v-on:click="setTab('ledger')">Ledger</button>
+            <button v-bind:class="{ bold: activeTab == 'summary' }" v-on:click="setTab('summary')">Summary</button>
+            <button v-bind:class="{ bold: activeTab == 'goals' }" v-on:click="setTab('goals')">Goals</button>
+            <button v-bind:class="{ bold: activeTab == 'expected' }" v-on:click="setTab('expected')">Expected</button>
         </div>
 
         <!-- Ledger -->
-        <div v-if="activeTab == 0">
+        <div v-if="activeTab == 'ledger'">
             <div class="newItem">
                 <input v-model="m.when" placeholder="Date" type="date">
                 <input v-model="m.where" placeholder="Where">
                 <input v-model="m.amount" placeholder="Amount" type="number" step="0.01">
                 <input v-model="m.category" placeholder="Category">
                 <input v-model="m.subcategory" placeholder="Subcategory">
-                <button v-on:click="post(m, '/transaction')">Add</button>
+                <button v-on:click="post(m, '/transaction', 'transactions')">Add</button>
             </div>
             <table class="table">
                 <tr class="table-header">
@@ -50,14 +51,14 @@
                     <td>{{transaction.subcategory}}</td>
                     <td>
                         <button v-on:click="prepareEntryEdit(transaction)">&#9881;</button>
-                        <button v-on:click="remove(transaction)">X</button>
+                        <button v-on:click="remove(transaction, 'transactions')">X</button>
                     </td>
                 </tr>
 
             </table>
         </div>
 
-        <table v-if="activeTab == 10">
+        <table v-if="activeTab == 'ledger-edit'">
             <tr>
                 <th></th>
                 <th>Date</th>
@@ -83,12 +84,12 @@
                 <td>
                     <input v-model="em.subcategory" placeholder="Subcategory">
                 </td>
-                <td><button v-on:click="updateMany(em);activeTab=0;">Update</button></td>
+                <td><button v-on:click="updateMany(em, 'transactions');activeTab=0;">Update</button></td>
             </tr>
         </table>
 
         <!-- Summary -->
-        <div v-if="activeTab == 1">
+        <div v-if="activeTab == 'summary'">
             <div class="summary-panel">
                 <h2>Weekly</h2>
                 <table class="table">
@@ -150,13 +151,13 @@
         </div>
 
         <!-- Goals -->
-        <div v-if="activeTab == 2">
+        <div v-if="activeTab == 'goals'">
             <div>
                 <div class="newItem">
                     <span>New Goal</span>
                     <input v-model="ng.name" placeholder="Name">
                     <input v-model="ng.total" placeholder="Total" type="number" step="0.01">
-                    <button v-on:click="post(ng, '/goals')">Add</button>
+                    <button v-on:click="post(ng, '/goals', 'goals')">Add</button>
                 </div>
                 <div class="newAllocation">
                     <span>Allocate funds</span>
@@ -167,7 +168,7 @@
                         <input v-model="na.amount" type="number">
                         <span>out of {{total_to_allocate}}</span>
                     </select>
-                    <button v-on:click="post(na, '/allocate')">Add</button>
+                    <button v-on:click="post(na, '/allocate', 'goals')">Add</button>
                 </div>
                 <table>
                     <tr><th></th><th>Name</th><th>Amount</th><th>Total</th><th>Remaining</th></tr>
@@ -177,6 +178,28 @@
                         <td>{{goal.amount}}</td>
                         <td>{{goal.total}}</td>
                         <td>{{goal.total - goal.amount}}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Expected -->
+        <div v-if="activeTab == 'expected'">
+            <div>
+                <div class="newItem">
+                    <span>New Expected</span>
+                    <input v-model="e.name" placeholder="Name">
+                    <input v-model="e.total" placeholder="Total" type="number" step="0.01">
+                    <input v-model="e.days" placeholder="Period (days)" type="number" step="1">
+                    <button v-on:click="post(e, '/expected', 'expected')">Add</button>
+                </div>
+                <table>
+                    <tr><th></th><th>Name</th><th>Total</th><th>Period</th></tr>
+                    <tr v-for="(e, i) in expected">
+                        <td class="table-index">{{i+1}}</td>
+                        <td>{{e.name}}</td>
+                        <td>{{e.total}}</td>
+                        <td>{{e.days}}</td>
                     </tr>
                 </table>
             </div>

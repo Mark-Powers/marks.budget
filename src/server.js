@@ -163,6 +163,29 @@ function setUpRoutes(models, jwtFunctions, database) {
             res.status(400).send(e.message);
         }
     })
+    server.get(`/expected`, async (req, res, next) => {
+        try {
+            var result = await database.query("SELECT * FROM expecteds WHERE username = '" + res.locals.user.username + "' ORDER BY `name` DESC", { type: database.QueryTypes.SELECT })
+            res.status(200).send(result);
+            next();
+        } catch (e) {
+            console.log(e)
+            res.status(400).send(e.message);
+        }
+    })
+    server.post(`/expected`, async (req, res, next) => {
+        try {
+            let item = req.body;
+            console.log(item);
+            item.username = res.locals.user.username
+            await models.expected.create(item);
+            var result = await database.query("SELECT * FROM expecteds WHERE username = '" + res.locals.user.username + "' ORDER BY `name` DESC", { type: database.QueryTypes.SELECT })
+            res.status(200).send(result);
+        } catch (e) {
+            console.log(e);
+            res.status(400).send(e.message);
+        }
+    })
     server.get(`/summary`, async (req, res, next) => {
         try {
             res.status(200).send({

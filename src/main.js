@@ -2,12 +2,13 @@ window.onload = function () {
     var transactionData = new Vue({
         el: '#data',
         data: {
-            activeTab: 0,
+            activeTab: "ledger",
             transactions: [],
             summary: {username : ""},
             selTodoType: "all",
             total_to_allocate: 0,
-            goals: []
+            goals: [],
+            expected: []
         },
         methods: {
             setTab: function (value) {
@@ -33,17 +34,24 @@ window.onload = function () {
                     total: "",
                     amount: 0
                 }
+                this.e = {
+                    name: "",
+                    total: "",
+                    days: 7
+                }
                 this.na = {
                     selected: "",
                     amount: ""
                 }
             },
-            requestThenUpdate: function (request) {
+            requestThenUpdate: function (request, app, field) {
                 fetch(request)
                     .then(response => response.json())
-                    .then(response => this.transactions = response);
+                    .then(response => {
+                        app[field] = response
+                    });
             },
-            post: function (obj, path) {
+            post: function (obj, path, save_to) {
                 console.log(obj);
                 console.log(path);
                 this.requestThenUpdate(new Request(path, {
@@ -53,10 +61,10 @@ window.onload = function () {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(obj)
-                }));
+                }), this, save_to);
                 this.clearData();
             },
-            remove: function (obj) {
+            remove: function (obj, save_to) {
                 if (confirm(`Delete transaction?`)) {
                     this.requestThenUpdate(new Request("/transaction", {
                         method: 'delete',
@@ -65,7 +73,7 @@ window.onload = function () {
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify(obj)
-                    }))
+                    }), this, save_to)
                 }
             },
             prepareEntryEdit: function(transaction){
@@ -75,9 +83,9 @@ window.onload = function () {
                 this.em.amount=transaction.amount;
                 this.em.category=transaction.category;
                 this.em.subcategory=transaction.subcategory;
-                this.activeTab=10;
+                this.activeTab='ledger-edit';
             },
-            updateMany: function (obj) {
+            updateMany: function (obj, save_to) {
                 update = {}
                 update = obj;
                 this.requestThenUpdate(new Request("/transaction", {
@@ -87,11 +95,13 @@ window.onload = function () {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({ id: obj.id, update: update })
-                }))
+                }),  this, save_to)
             },
         },
         created() {
             this.clearData();
+            fetch(new Request(`/expected`)).then(response => response.json())
+                .then(response => this.expected = response);
             fetch(new Request(`/goals`)).then(response => response.json())
                 .then(response => this.goals = response);
             fetch(new Request(`/transaction`)).then(response => response.json())
