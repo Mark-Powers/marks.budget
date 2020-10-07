@@ -72,6 +72,24 @@ function setUpModels() {
         allowNull: false,
       },
     }),
+    "goals": database.define('goal', {
+      username: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      name: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      total: {
+        type: Sequelize.DECIMAL,
+        allowNull: false,
+      }, 
+      amount: {
+        type: Sequelize.DECIMAL,
+        allowNull: false,
+      }
+    }),
     "users": database.define('user', {
       username: {
         type: Sequelize.STRING,

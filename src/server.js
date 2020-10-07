@@ -14,7 +14,7 @@ server.use(bodyParser.json());
 //server.use(bodyParser.urlencoded({ extended: true }));
 
 function listen(port) {
-    server.listen(port, () => console.info(`Listening on port ${port}!`));
+    server.listen(port, () => console.info(`Listening: http://localhost:${port} `));
 }
 
 function hashWithSalt(password, salt){
@@ -36,7 +36,6 @@ function setUpRoutes(models, jwtFunctions, database) {
             try {
                 const decryptedUserId = jwtFunctions.verify(cookie);
                 var user = await models.users.findOne({ where: { username: decryptedUserId } });
-                // .then((user, error) => {
                 if (user) {
                     res.locals.user = user.get({ plain: true });
                 } else {
@@ -44,7 +43,6 @@ function setUpRoutes(models, jwtFunctions, database) {
                     res.redirect('/login');
                     return;
                 }
-                // });
             } catch (e) {
                 res.status(400).send(e.message);
             }
@@ -122,6 +120,43 @@ function setUpRoutes(models, jwtFunctions, database) {
             console.log(update)
             await toUpdate.update(update);
             var result = await database.query("SELECT * FROM transactions WHERE username = '" + res.locals.user.username + "' ORDER BY `when` DESC", { type: database.QueryTypes.SELECT })
+            res.status(200).send(result);
+        } catch (e) {
+            console.log(e);
+            res.status(400).send(e.message);
+        }
+    })
+    server.get(`/goals`, async (req, res, next) => {
+        try {
+            var result = await database.query("SELECT * FROM goals WHERE username = '" + res.locals.user.username + "' ORDER BY `name` DESC", { type: database.QueryTypes.SELECT })
+            res.status(200).send(result);
+            next();
+        } catch (e) {
+            console.log(e)
+            res.status(400).send(e.message);
+        }
+    })
+    server.post(`/goals`, async (req, res, next) => {
+        try {
+            let item = req.body;
+            console.log(item);
+            item.username = res.locals.user.username
+            await models.goals.create(item);
+            var result = await database.query("SELECT * FROM goals WHERE username = '" + res.locals.user.username + "' ORDER BY `name` DESC", { type: database.QueryTypes.SELECT })
+            res.status(200).send(result);
+        } catch (e) {
+            console.log(e);
+            res.status(400).send(e.message);
+        }
+    })
+    server.post(`/allocate`, async (req, res, next) => {
+        try {
+            let name = req.body.name;
+            let amount = req.body.amount;
+            var toUpdate = await models.goals.findOne({ where: { name: name, username:res.locals.user.username } });
+            var update = {amount: toUpdate.amount + amount}
+            await toUpdate.update(update);
+            var result = await await database.query("SELECT * FROM goals WHERE username = '" + res.locals.user.username + "' ORDER BY `name` DESC", { type: database.QueryTypes.SELECT })
             res.status(200).send(result);
         } catch (e) {
             console.log(e);

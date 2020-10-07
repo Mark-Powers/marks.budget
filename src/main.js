@@ -6,6 +6,8 @@ window.onload = function () {
             transactions: [],
             summary: {username : ""},
             selTodoType: "all",
+            total_to_allocate: 0,
+            goals: []
         },
         methods: {
             setTab: function (value) {
@@ -25,6 +27,15 @@ window.onload = function () {
                     amount: "",
                     category: "",
                     subcategory: "",
+                }
+                this.ng = {
+                    name: "",
+                    total: "",
+                    amount: 0
+                }
+                this.na = {
+                    selected: "",
+                    amount: ""
                 }
             },
             requestThenUpdate: function (request) {
@@ -81,6 +92,8 @@ window.onload = function () {
         },
         created() {
             this.clearData();
+            fetch(new Request(`/goals`)).then(response => response.json())
+                .then(response => this.goals = response);
             fetch(new Request(`/transaction`)).then(response => response.json())
                 .then(response => this.transactions = response);
             fetch(new Request(`/summary`)).then(response => response.json())
@@ -160,6 +173,12 @@ window.onload = function () {
                         // Note we flip these since income is negative
                         item.negative = el.s > 0
                         item.positive = el.s < 0
+                        
+                        // -= since its flipped
+                        this.total_to_allocate -= item.net
+                    })
+                    this.goals.forEach(el => {
+                        this.total_to_allocate -= el.amount
                     })
 
                     this.summary.week.sort(function(a, b){
@@ -173,6 +192,9 @@ window.onload = function () {
                     this.summary.year.sort(function(a, b){
                         return a.y-b.y;
                     })
+                    
+                    seriesX = this.summary.month.map(el => el.y)
+
 
                     this.summary.username = response.username
                 });

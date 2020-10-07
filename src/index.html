@@ -18,6 +18,7 @@
         <div>
             <button v-bind:class="{ bold: activeTab == 0 }" v-on:click="setTab(0)">Ledger</button>
             <button v-bind:class="{ bold: activeTab == 1 }" v-on:click="setTab(1)">Summary</button>
+            <button v-bind:class="{ bold: activeTab == 2 }" v-on:click="setTab(2)">Goals</button>
         </div>
 
         <!-- Ledger -->
@@ -64,7 +65,6 @@
                 <th>Amount</th>
                 <th>Category</th>
                 <th>Subcategory</th>
-
             </tr>
             <tr>
                 <td></td>
@@ -144,6 +144,39 @@
                         <td>{{data.out}}</td>
                         <td v-bind:class="{'net-negative': data.negative, 'net-positive':data.positive}">{{data.net}}
                         </td v-bind:class="{'net-negative': data.negative, 'net-positive':data.positive}">
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Goals -->
+        <div v-if="activeTab == 2">
+            <div>
+                <div class="newItem">
+                    <span>New Goal</span>
+                    <input v-model="ng.name" placeholder="Name">
+                    <input v-model="ng.total" placeholder="Total" type="number" step="0.01">
+                    <button v-on:click="post(ng, '/goals')">Add</button>
+                </div>
+                <div class="newAllocation">
+                    <span>Allocate funds</span>
+                    <select v-model="na.name">
+                        <option v-for="option in goals" v-bind:value="option.name">
+                            {{ option.name }}
+                        </option>
+                        <input v-model="na.amount" type="number">
+                        <span>out of {{total_to_allocate}}</span>
+                    </select>
+                    <button v-on:click="post(na, '/allocate')">Add</button>
+                </div>
+                <table>
+                    <tr><th></th><th>Name</th><th>Amount</th><th>Total</th><th>Remaining</th></tr>
+                    <tr v-for="(goal, i) in goals">
+                        <td class="table-index">{{i+1}}</td>
+                        <td>{{goal.name}}</td>
+                        <td>{{goal.amount}}</td>
+                        <td>{{goal.total}}</td>
+                        <td>{{goal.total - goal.amount}}</td>
                     </tr>
                 </table>
             </div>

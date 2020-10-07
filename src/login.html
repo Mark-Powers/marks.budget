@@ -7,9 +7,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" type="text/css" href="/css/styles.css">
     <script>
+        let usernameEl = document.getElementById('username');
+        let passwordEl = document.getElementById('password');
         function sendPost(){
-            let username = document.getElementById('username').value;
-            let password = document.getElementById('password').value;
+            let username = usernameEl.value;
+            let password = passwordEl.value;
             fetch(new Request("/login", {
                     method: 'POST',
                     headers: {
@@ -23,6 +25,13 @@
                     window.location = "/";
                 });
         }
+        let onEnterEvent = function(event) {
+            if (event.keyCode === 13) {
+                sendPost()
+            }
+        }
+        usernameEl.addEventListener("keyup", onEnterEvent);
+        passwordEl.addEventListener("keyup", onEnterEvent);
     </script>
 </head>
 
@@ -30,7 +39,7 @@
     <div>
         <h1>Login</h1>
         <div class="form">
-            <input type="text" placeholder="Enter Username" name="username" id="username" required>
+            <input on type="text" placeholder="Enter Username" name="username" id="username" required>
             <input type="password" placeholder="Enter Password" name="password" id="password" required>
             <button onclick="sendPost()">Log in</button> 
         </div>
