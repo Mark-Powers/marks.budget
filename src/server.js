@@ -11,7 +11,7 @@ const config = JSON.parse(fs.readFileSync(path.join(__dirname, 'config.json')));
 const server = express();
 server.use(cookieParser())
 server.use(bodyParser.json());
-//server.use(bodyParser.urlencoded({ extended: true }));
+server.use(bodyParser.urlencoded({ extended: true }));
 
 function listen(port) {
     server.listen(port, () => console.info(`Listening: http://localhost:${port} `));
@@ -23,7 +23,7 @@ function hashWithSalt(password, salt){
     return hash.digest("base64");
 };
 
-function setUpRoutes(models, jwtFunctions, database) {
+function setUpRoutes(models, jwtFunctions, database, templates) {
     // Authentication routine
     server.use(async function (req, res, next) {
         if (!req.path.toLowerCase().startsWith("/login")) {
@@ -58,8 +58,19 @@ function setUpRoutes(models, jwtFunctions, database) {
 
     server.get('/', (req, res) => res.sendFile(__dirname + "/index.html"))
     server.get('/login', (req, res) => res.sendFile(__dirname + "/login.html"))
-    server.get('/styles.css', (req, res) => res.sendFile(__dirname + "/styles.css"))
-    server.get('/main.js', (req, res) => res.sendFile(__dirname + "/main.js"))
+
+    server.get('/summary', async (req, res) => {
+        var ledger = await database.query("SELECT * FROM transactions WHERE username = '" + res.locals.user.username + "' ORDER BY `when` DESC", { type: database.QueryTypes.SELECT })
+        ledger.forEach((element, i) => {
+            element.when = element.when.toString().substring(0, 10);
+            element.index = i+1
+        });
+        var name = res.locals.user.username
+        let body = templates["summary"]({ name, ledger })
+        res.status(200).send(body)
+    })
+
+    server.use('/static', express.static(path.join(__dirname, '/static')))
 
     server.post('/login', async (req, res, next) => {
         const user = await models.users.findOne({ where: { username: req.body.username} })
@@ -90,9 +101,11 @@ function setUpRoutes(models, jwtFunctions, database) {
             let item = req.body;
             console.log(item);
             item.username = res.locals.user.username
+            if(!item.when){
+                item.when = new Date().toLocaleDateString();
+            }
             await models.transaction.create(item);
-            var result = await database.query("SELECT * FROM transactions WHERE username = '" + res.locals.user.username + "' ORDER BY `when` DESC", { type: database.QueryTypes.SELECT })
-            res.status(200).send(result);
+            res.redirect("/summary")
         } catch (e) {
             console.log(e);
             res.status(400).send(e.message);
@@ -126,6 +139,7 @@ function setUpRoutes(models, jwtFunctions, database) {
             res.status(400).send(e.message);
         }
     })
+    
     server.get(`/goals`, async (req, res, next) => {
         try {
             var result = await database.query("SELECT * FROM goals WHERE username = '" + res.locals.user.username + "' ORDER BY `name` DESC", { type: database.QueryTypes.SELECT })

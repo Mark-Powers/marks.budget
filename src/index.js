@@ -4,11 +4,12 @@ const fs = require('fs');
 const path = require('path');
 const jwt = require('jsonwebtoken');
 
-
 const config = JSON.parse(fs.readFileSync(path.join(__dirname, 'config.json')));
-
 const dbCreds = config.database;
 const secret = config.jwt_secret;
+
+const models = require('./models');
+const templates = require('./templates');
 
 const jwtFunctions = {
   sign: function (message) {
@@ -44,90 +45,11 @@ async function sync(alter, force, callback) {
   await database.sync({ alter, force, logging: console.log });
 }
 
-function setUpModels() {
-  const models = {
-    "transaction": database.define('transaction', {
-      when: {
-        type: Sequelize.DATE,
-        allowNull: false,
-      },
-      amount: {
-        type: Sequelize.DECIMAL,
-        allowNull: false,
-      },
-      where: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-      category: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-      subcategory: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-      username: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-    }),
-    "goals": database.define('goal', {
-      username: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-      name: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-      total: {
-        type: Sequelize.DECIMAL,
-        allowNull: false,
-      }, 
-      amount: {
-        type: Sequelize.DECIMAL,
-        allowNull: false,
-      }
-    }),
-    "expected": database.define('expected', {
-      username: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-      name: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-      total: {
-        type: Sequelize.DECIMAL,
-        allowNull: false,
-      }, 
-      days: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-      }
-    }),
-    "users": database.define('user', {
-      username: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-      password: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-      salt: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },}),
-  }
-  return models;
-}
 
-const models = setUpModels();
 sync();
 
-server.setUpRoutes(models, jwtFunctions, database);
+server.setUpRoutes(models.setUpModels(database), 
+  jwtFunctions, 
+  database, templates.setUpTemplates());
 server.listen(config.port);
 
