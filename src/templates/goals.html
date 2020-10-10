@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>{{name}}'s Budget</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="static/styles.css">
+</head>
+
+<body>
+    <h1>{{name}}'s Budget</h1>
+    <div>
+        <a href="/ledger"><button>Ledger</button></a>
+        <a href="/summary"><button>Summary</button></a>
+        <a href="/goals"><button class="bold">Goals</button></a>
+        <a href="/expected"><button>Expected</button></a>
+    </div>
+
+    <form method="post" action="/goals">
+        <input name="name" placeholder="name">
+        <input name="total" placeholder="total" type="number" step="0.01">
+        <input type="submit" value="Add">
+    </form>
+    <form method="post" action="/allocate">
+        <span>Allocate funds</span>
+        <select name="name">
+            {{#each goals}}
+            <option value="{{this.name}}">
+                {{ this.name }}
+            </option>
+            {{/each}}
+        </select>
+        <input name="amount" placeholder="amount" type="number">
+        <input type="submit" value="Add">
+    </form>
+    <table>
+        <tr><th></th><th>Name</th><th>Amount</th><th>Total</th><th>Remaining</th></tr>
+        {{#each goals}}
+        <tr>
+            <td class="table-index">{{this.index}}</td>
+            <td>{{this.name}}</td>
+            <td>{{this.amount}}</td>
+            <td>{{this.total}}</td>
+            <td>{{this.remaining}}</td>
+        </tr>
+        {{/each}}
+    </table>
+</body>
+</html>
+
