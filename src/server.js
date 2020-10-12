@@ -69,6 +69,13 @@ function setUpRoutes(models, jwtFunctions, database, templates) {
         let body = templates["ledger"]({ name, ledger })
         res.status(200).send(body)
     })
+    server.get('/ledger/edit/:id', async (req, res) => {
+        let ledger = await database.query(`SELECT * FROM transactions WHERE username = '${res.locals.user.username}' and id='${req.params.id}' ORDER BY \`when\` DESC`, { type: database.QueryTypes.SELECT })
+        let ledger_item = ledger[0]
+        let name = res.locals.user.username
+        let body = templates["ledger-edit"]({ name, item: ledger_item })
+        res.status(200).send(body)
+    })
     server.get('/goals', async (req, res) => {
         let goals = await database.query(`SELECT * FROM goals WHERE username = '${res.locals.user.username}' ORDER BY \`name\` DESC`, { type: database.QueryTypes.SELECT })
         goals.forEach((element, i) => {
@@ -95,33 +102,15 @@ function setUpRoutes(models, jwtFunctions, database, templates) {
     })
     server.get(`/summary`, async (req, res, next) => {
         try {
-            let data = {
-                week: {
-                    out: await database.query(`SELECT year(\`when\`) as y, week(\`when\`) as w, sum(amount) as s FROM transactions where username = '${res.locals.user.username}' and amount > 0 group by year(\`when\`), WEEK(\`when\`);`, { type: database.QueryTypes.SELECT }),
-                    in: await database.query(`SELECT year(\`when\`)as y,   week(\`when\`) as w, sum(amount) as s FROM transactions where username = '${res.locals.user.username}' and amount < 0 group by year(\`when\`), WEEK(\`when\`);`, { type: database.QueryTypes.SELECT }),
-                    net: await database.query(`SELECT year(\`when\`) as y, week(\`when\`) as w, sum(amount) as s FROM transactions where username = '${res.locals.user.username}' group by year(\`when\`), WEEK(\`when\`);`, { type: database.QueryTypes.SELECT }),
-                },
-                month: {
-                    out: await database.query(`SELECT year(\`when\`) as y, month(\`when\`) as m, sum(amount) as s FROM transactions where username = '${res.locals.user.username}' and amount > 0 group by year(\`when\`), month(\`when\`);`, { type: database.QueryTypes.SELECT }),
-                    in: await database.query(`SELECT year(\`when\`)  as y, month(\`when\`) as m, sum(amount) as s FROM transactions where username = '${res.locals.user.username}' and amount < 0 group by year(\`when\`), month(\`when\`);`, { type: database.QueryTypes.SELECT }),
-                    net: await database.query(`SELECT year(\`when\`) as y, month(\`when\`) as m, sum(amount) as s FROM transactions where username = '${res.locals.user.username}' group by year(\`when\`), month(\`when\`);`, { type: database.QueryTypes.SELECT }),
-                },
-                year: {
-                    out: await database.query(`SELECT year(\`when\`) as y, sum(amount) as s FROM transactions where username = '${res.locals.user.username}' and amount > 0 group by year(\`when\`);`, { type: database.QueryTypes.SELECT }),
-                    in: await database.query(`SELECT year(\`when\`)  as y, sum(amount) as s FROM transactions where username = '${res.locals.user.username}' and amount < 0 group by year(\`when\`);`, { type: database.QueryTypes.SELECT }),
-                    net: await database.query(`SELECT year(\`when\`) as y, sum(amount) as s FROM transactions where username = '${res.locals.user.username}' group by year(\`when\`);`, { type: database.QueryTypes.SELECT }),
-                },
-                name: res.locals.user.username
-            };
-            data = formatSummary(data)
+            let data = await formatSummary(database, res.locals.user.username)
             let body = templates["summary"](data)
             res.status(200).send(body);
-
         } catch (e) {
             console.log(e)
             res.status(400).send(e.message);
         }
     })
+    
 
 
     server.post('/login', async (req, res, next) => {
@@ -140,7 +129,6 @@ function setUpRoutes(models, jwtFunctions, database, templates) {
     server.post(`/transaction`, async (req, res, next) => {
         try {
             let item = req.body;
-            console.log(item);
             item.username = res.locals.user.username
             if (!item.when) {
                 item.when = new Date().toLocaleDateString();
@@ -187,6 +175,28 @@ function setUpRoutes(models, jwtFunctions, database, templates) {
             res.status(400).send(e.message);
         }
     })
+    server.post(`/transaction/:id`, async (req, res, next) => {
+        try {
+            let id = req.params.id;
+            let update = req.body;
+            if(update.when.length == 0){
+                delete update.when
+            }
+            var toUpdate = await models.transaction.findOne({ where: { id: id, username:res.locals.user.username } });
+            await toUpdate.update(update);
+            res.redirect(`/ledger`)
+        } catch (e) {
+            console.log(e);
+            res.status(400).send(e.message);
+        }
+    })
+
+    server.delete('/ledger/:id', async (req, res) => {
+        let id = req.params.id;
+        console.log(id, res.locals.user.username)
+        await models.transaction.destroy({ where: { id, username: res.locals.user.username } });
+        res.redirect('/ledger')
+    })
 }
 
 var findOrCreateWeek = function (summary, el) {
@@ -220,7 +230,24 @@ var findOrCreateYear = function (summary, el) {
     return item
 }
 
-function formatSummary(response) {
+async function formatSummary(database, username) {
+    let response = {
+        week: {
+            out: await database.query(`SELECT year(\`when\`) as y, week(\`when\`) as w, sum(amount) as s FROM transactions where username = '${username}' and amount > 0 group by year(\`when\`), WEEK(\`when\`);`, { type: database.QueryTypes.SELECT }),
+            in: await database.query(`SELECT year(\`when\`)as y,   week(\`when\`) as w, sum(amount) as s FROM transactions where username = '${username}' and amount < 0 group by year(\`when\`), WEEK(\`when\`);`, { type: database.QueryTypes.SELECT }),
+            net: await database.query(`SELECT year(\`when\`) as y, week(\`when\`) as w, sum(amount) as s FROM transactions where username = '${username}' group by year(\`when\`), WEEK(\`when\`);`, { type: database.QueryTypes.SELECT }),
+        },
+        month: {
+            out: await database.query(`SELECT year(\`when\`) as y, month(\`when\`) as m, sum(amount) as s FROM transactions where username = '${username}' and amount > 0 group by year(\`when\`), month(\`when\`);`, { type: database.QueryTypes.SELECT }),
+            in: await database.query(`SELECT year(\`when\`)  as y, month(\`when\`) as m, sum(amount) as s FROM transactions where username = '${username}' and amount < 0 group by year(\`when\`), month(\`when\`);`, { type: database.QueryTypes.SELECT }),
+            net: await database.query(`SELECT year(\`when\`) as y, month(\`when\`) as m, sum(amount) as s FROM transactions where username = '${username}' group by year(\`when\`), month(\`when\`);`, { type: database.QueryTypes.SELECT }),
+        },
+        year: {
+            out: await database.query(`SELECT year(\`when\`) as y, sum(amount) as s FROM transactions where username = '${username}' and amount > 0 group by year(\`when\`);`, { type: database.QueryTypes.SELECT }),
+            in: await database.query(`SELECT year(\`when\`)  as y, sum(amount) as s FROM transactions where username = '${username}' and amount < 0 group by year(\`when\`);`, { type: database.QueryTypes.SELECT }),
+            net: await database.query(`SELECT year(\`when\`) as y, sum(amount) as s FROM transactions where username = '${username}' group by year(\`when\`);`, { type: database.QueryTypes.SELECT }),
+        },
+    };
     let summary = {}
     summary.week = [];
     summary.month = [];
@@ -295,7 +322,7 @@ function formatSummary(response) {
         return a.y - b.y;
     })
 
-    summary.name = response.name
+    summary.name = username
     return summary
 }
 

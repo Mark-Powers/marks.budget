@@ -5,6 +5,7 @@
     <title>{{name}}'s Budget</title>
     <meta charset="UTF-8">
     <link rel="stylesheet" type="text/css" href="static/styles.css">
+    <script src="/static/main.js"></script>
 </head>
 
 <body>
@@ -31,6 +32,8 @@
             <th>Amount</th>
             <th>Category</th>
             <th>Tags</th>
+            <th></th>
+            <th></th>
         </tr>
         {{#each ledger}}
         <tr>
@@ -40,6 +43,8 @@
             <td>{{this.amount}}</td>
             <td>{{this.category}}</td>
             <td>{{this.subcategory}}</td>
+            <td><a href="/ledger/edit/{{this.id}}"><button>&#9881;</button></a></td>
+            <td><button onclick="remove({{this.id}})">X</button></td>
         </tr>
         {{/each}}
     </table>

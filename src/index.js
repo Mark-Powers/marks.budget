@@ -22,7 +22,7 @@ const jwtFunctions = {
 
 const database = new Sequelize(dbCreds.database, dbCreds.user, dbCreds.password, {
   logging(str) {
-    console.debug(`DB:${str}`);
+    console.debug(`DB: ${str}`);
   },
   dialectOptions: {
     charset: 'utf8mb4',

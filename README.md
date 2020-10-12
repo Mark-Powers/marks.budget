@@ -1,6 +1,9 @@
 # marks.budget
 
-# Installation
+## Usage
+Manage your personal budget with this site. You can track a ledger of expenses, goals, and recurring expected expenses. A summary view breaks down differences weekly, monthly, and yearly. 
+
+## Installation
 Download the repository, run `npm install`, set up a mysql server with a user and a database, 
 fill out a `config.json` file as specified below, and then `npm run run`. 
 
@@ -17,3 +20,7 @@ fill out a `config.json` file as specified below, and then `npm run run`.
 }
 
 ```
+## TODO
+- Add graphs
+- Add initial balance somewhere
+- Add assets/liabilities?
