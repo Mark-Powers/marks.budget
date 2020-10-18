@@ -92,11 +92,16 @@ function setUpRoutes(models, jwtFunctions, database, templates) {
     server.get(`/expected`, async (req, res, next) => {
         try {
             let expecteds = await database.query(`SELECT * FROM expecteds WHERE username = '${res.locals.user.username}' ORDER BY \`name\` DESC`, { type: database.QueryTypes.SELECT })
+            let day_average = 0
             expecteds.forEach((element, i) => {
                 element.index = i + 1
+                day_average = element.total / element.days
             });
             let name = res.locals.user.username
-            let body = templates["expected"]({ name, expecteds })
+            let week = Math.round(day_average * 7)
+            let month = Math.round(day_average * 31)
+            let year = Math.round(day_average * 365)
+            let body = templates["expected"]({ name, expecteds, week, month, year })
             res.status(200).send(body);
         } catch (e) {
             console.log(e)
@@ -306,6 +311,10 @@ async function formatSummary(database, username) {
     summary.year_avg = getBudgetAverage(summary.year)
     summary.month_avg = getBudgetAverage(summary.month)
     summary.week_avg = getBudgetAverage(summary.week)
+
+
+    summary.categories = await database.query(`select category, sum(amount) as s from transactions where category <> '' group by category`, { type: database.QueryTypes.SELECT });
+    summary.subcategories = await database.query(`select subcategory, sum(amount) as s from transactions where subcategory <> '' group by subcategory`, { type: database.QueryTypes.SELECT });
     summary.name = username
     return summary
 }

@@ -99,6 +99,36 @@
             </tr>
         </table>
     </div>
+    <div class="summary-panel">
+        <h2>Categories</h2>
+        <table class="table">
+            <tr>
+                <th>Category</th>
+                <th>Total</th>
+            </tr>
+            {{#each categories}}
+            <tr>
+                <td>{{this.category}}</td>
+                <td>{{this.s}}</td>
+            </tr>
+            {{/each}}
+        </table>
+    </div>
+    <div class="summary-panel">
+        <h2>Sub-Categories</h2>
+        <table class="table">
+            <tr>
+                <th>Sub-Category</th>
+                <th>Total</th>
+            </tr>
+            {{#each subcategories}}
+            <tr>
+                <td>{{this.subcategory}}</td>
+                <td>{{this.s}}</td>
+            </tr>
+            {{/each}}
+        </table>
+    </div>
 </body>
 
 </html>
