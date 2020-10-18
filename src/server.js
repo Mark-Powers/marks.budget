@@ -58,7 +58,10 @@ function setUpRoutes(models, jwtFunctions, database, templates) {
 
     server.use('/static', express.static(path.join(__dirname, '/static')))
     server.get('/', (req, res) => res.redirect("/ledger"))
-    server.get('/login', (req, res) => res.sendFile(path.join(__dirname, "/login.html")))
+    server.get('/login', (req, res) => {
+        let body = templates["login"]({});
+        res.status(200).send(body)
+    })
     server.get('/ledger', async (req, res) => {
         var ledger = await database.query(`SELECT * FROM transactions WHERE username = '${res.locals.user.username}' ORDER BY \`when\` DESC`, { type: database.QueryTypes.SELECT })
         ledger.forEach((element, i) => {
@@ -120,7 +123,7 @@ function setUpRoutes(models, jwtFunctions, database, templates) {
             const token = jwtFunctions.sign(user.username);
             res.cookie('authorization', token, { expires: new Date(Date.now() + (1000 * 60 * 60 * 24 * 30)) });
             console.debug("Redirecting to page - logged in")
-            res.redirect('/');
+            res.redirect('/ledger');
         } else {
             console.debug("Redirecting to login - invalid login")
             res.redirect('/login');
@@ -261,15 +264,8 @@ async function formatSummary(database, username) {
     })
     response.week.net.forEach(el => {
         var item = findOrCreateWeek(summary, el);
-        item.net = el.s
-        // Note we flip these since income is negative
-        item.classes = ""
-        if(el.s > 0){
-            item.classes += "net-negative"
-        }
-        if(el.s < 0){
-            item.classes += "net-positive"
-        }
+        item.net = Number(el.s)
+        item.classes = getClass(el.s)
     })
 
     response.month.in.forEach(el => {
@@ -280,15 +276,8 @@ async function formatSummary(database, username) {
     })
     response.month.net.forEach(el => {
         var item = findOrCreateMonth(summary, el);
-        item.net = el.s
-        // Note we flip these since income is negative
-        item.classes = ""
-        if(el.s > 0){
-            item.classes += "net-negative"
-        }
-        if(el.s < 0){
-            item.classes += "net-positive"
-        }
+        item.net = Number(el.s)
+        item.classes = getClass(el.s)
     })
 
     response.year.in.forEach(el => {
@@ -299,15 +288,8 @@ async function formatSummary(database, username) {
     })
     response.year.net.forEach(el => {
         var item = findOrCreateYear(summary, el);
-        item.net = el.s
-        // Note we flip these since income is negative
-        item.classes = ""
-        if(el.s > 0){
-            item.classes += "net-negative"
-        }
-        if(el.s < 0){
-            item.classes += "net-positive"
-        }
+        item.net = Number(el.s)
+        item.classes = getClass(el.s)
     })
 
     summary.week.sort(function (a, b) {
@@ -321,10 +303,37 @@ async function formatSummary(database, username) {
     summary.year.sort(function (a, b) {
         return a.y - b.y;
     })
-
+    summary.year_avg = getBudgetAverage(summary.year)
+    summary.month_avg = getBudgetAverage(summary.month)
+    summary.week_avg = getBudgetAverage(summary.week)
     summary.name = username
     return summary
 }
+
+function getBudgetAverage(list){
+    let avg = { out: 0, in: 0, net: 0}
+    list.forEach(item => {
+        avg.out += item.out
+        avg.in += item.in
+        avg.net += item.net
+    })
+    avg.out = Math.round(avg.out / list.length)
+    avg.in = Math.round(avg.in / list.length)
+    avg.net = Math.round(avg.net / list.length)
+    avg.classes = getClass(avg.net)
+    return avg;
+}
+
+function getClass(value){
+    if(value > 0){
+        return "net-negative"
+    }
+    if(value < 0){
+        return "net-positive"
+    }
+    return ""
+}
+
 
 module.exports = {
     listen,

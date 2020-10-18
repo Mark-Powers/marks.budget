@@ -21,6 +21,7 @@ fill out a `config.json` file as specified below, and then `npm run run`.
 
 ```
 ## TODO
+- Add expected summary (maybe in /summary? compare to averages?)
 - Add graphs
 - Add initial balance somewhere
 - Add assets/liabilities?

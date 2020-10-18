@@ -38,10 +38,10 @@
 <body>
     <div>
         <h1>Login</h1>
-        <div class="form">
-            <input on type="text" placeholder="Enter Username" name="username" id="username" required>
-            <input type="password" placeholder="Enter Password" name="password" id="password" required>
-            <button onclick="sendPost()">Log in</button> 
+        <form method="post" action="/login">
+            <input name="username" type="text" placeholder="Enter Username" required>
+            <input type="password" placeholder="Enter Password" name="password" required>
+            <input type="submit" vallue="Log in"> 
         </div>
     </div>
 </body>

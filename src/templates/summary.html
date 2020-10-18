@@ -35,6 +35,14 @@
                 <td class="{{this.classes}}">{{this.net}}</td>
             </tr>
             {{/each}}
+            Avg:
+            <tr>
+                <td>Avg:</td>
+                <td></td>
+                <td>{{week_avg.in}}</td>
+                <td>{{week_avg.out}}</td>
+                <td class="{{week_avg.classes}}">{{week_avg.net}}</td>
+            </tr>
         </table>
     </div>
     <div class="summary-panel">
@@ -56,6 +64,13 @@
                 <td class="{{this.classes}}">{{this.net}}</td>
             </tr>
             {{/each}}
+            <tr>
+                <td>Avg:</td>
+                <td></td>
+                <td>{{month_avg.in}}</td>
+                <td>{{month_avg.out}}</td>
+                <td class="{{month_avg.classes}}">{{month_avg.net}}</td>
+            </tr>
         </table>
     </div>
     <div class="summary-panel">
@@ -75,6 +90,13 @@
                 <td class="{{this.classes}}">{{this.net}}</td>
             </tr>
             {{/each}}
+            Avg:
+            <tr>
+                <td>Avg:</td>
+                <td>{{year_avg.in}}</td>
+                <td>{{year_avg.out}}</td>
+                <td class="{{year_avg.classes}}">{{year_avg.net}}</td>
+            </tr>
         </table>
     </div>
 </body>
