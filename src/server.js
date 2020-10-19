@@ -26,7 +26,8 @@ function hashWithSalt(password, salt) {
 function setUpRoutes(models, jwtFunctions, database, templates) {
     // Authentication routine
     server.use(async function (req, res, next) {
-        if (!req.path.toLowerCase().startsWith("/login")) {
+        let path = req.path.toLowerCase();
+        if (!path.startsWith("/login")) {
             let cookie = req.cookies.authorization
             if (!cookie) {
                 console.debug("Redirecting to login - no cookie")
@@ -58,8 +59,16 @@ function setUpRoutes(models, jwtFunctions, database, templates) {
 
     server.use('/static', express.static(path.join(__dirname, '/static')))
     server.get('/', (req, res) => res.redirect("/ledger"))
+    server.get('/about', (req, res) => {
+        let body = templates["about"]({});
+        res.status(200).send(body)
+    })
     server.get('/login', (req, res) => {
         let body = templates["login"]({});
+        res.status(200).send(body)
+    })
+    server.get('/login/signup', async (req, res) => {
+        let body = templates["signup"]({});
         res.status(200).send(body)
     })
     server.get('/ledger', async (req, res) => {
@@ -133,6 +142,30 @@ function setUpRoutes(models, jwtFunctions, database, templates) {
             console.debug("Redirecting to login - invalid login")
             res.redirect('/login');
         }
+    })
+    server.post('/login/signup', async (req, res) => {
+        if(req.body.code != config.signup_code){
+            console.debug("Redirecting to signup - bad code")
+            res.redirect('/login/signup');
+            return;
+        }
+        const user = await models.users.findOne({ where: { username: req.body.username } })
+        if(user){
+            console.debug("Redirecting to signup - user already exists")
+            res.redirect('/login/signup');
+            return;
+        }
+        let salt = crypto.randomBytes(32).toString("Base64");
+        let password = req.body.password
+        const hash = hashWithSalt(password, salt)
+        let new_user = {
+            username: req.body.username,
+            password: hash,
+            salt: salt
+        }
+        await models.users.create(new_user);
+        console.debug("Created account - log in")
+        res.redirect("/login")
     })
     server.post(`/transaction`, async (req, res, next) => {
         try {

@@ -24,5 +24,9 @@ fill out a `config.json` file as specified below, and then `npm run run`.
 - Add expected summary (maybe in /summary? compare to averages?)
     - add rolling category values (grocery last month, last year, all time)
 - Add graphs
-- Add initial balance somewhere
 - Add assets/liabilities?
+- Add profile page
+    - Add initial balance somewhere
+    - Reset password
+- Add admin page
+- Add signup page with code needed

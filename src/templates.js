@@ -9,8 +9,9 @@ function loadTemplate(templates, name, filepath){
 
 function setUpTemplates(){
     let templates = {};
-    
+    loadTemplate(templates, "about", path.join(__dirname, 'templates/about.html'))
     loadTemplate(templates, "login", path.join(__dirname, 'templates/login.html'))
+    loadTemplate(templates, "signup", path.join(__dirname, 'templates/sign-up.html'))
     loadTemplate(templates, "ledger", path.join(__dirname, 'templates/ledger.html'))
     loadTemplate(templates, "ledger-edit", path.join(__dirname, 'templates/ledger-edit.html'))
     loadTemplate(templates, "goals", path.join(__dirname, 'templates/goals.html'))
