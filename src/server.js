@@ -313,8 +313,8 @@ async function formatSummary(database, username) {
     summary.week_avg = getBudgetAverage(summary.week)
 
 
-    summary.categories = await database.query(`select category, sum(amount) as s from transactions where category <> '' group by category`, { type: database.QueryTypes.SELECT });
-    summary.subcategories = await database.query(`select subcategory, sum(amount) as s from transactions where subcategory <> '' group by subcategory`, { type: database.QueryTypes.SELECT });
+    summary.categories = await database.query(`select category, sum(amount) as s from transactions where username = '${username}' and category <> '' group by category`, { type: database.QueryTypes.SELECT });
+    summary.subcategories = await database.query(`select subcategory, sum(amount) as s from transactions where username = '${username}' and subcategory <> '' group by subcategory`, { type: database.QueryTypes.SELECT });
     summary.name = username
     return summary
 }
