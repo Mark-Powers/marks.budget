@@ -19,8 +19,8 @@
     </div>
     <form method="post" action="/transaction">
         <input id="datePicker" name="when" placeholder="date" type="date"> 
-        <input name="where" placeholder="where" type="text"> 
-        <input name="amount" placeholder="amount" type="number" step="0.01"> 
+        <input required name="where" placeholder="where" type="text"> 
+        <input required name="amount" placeholder="amount" type="number" step="0.01"> 
         <input name="category" placeholder="category" type="text"> 
         <input name="subcategory" placeholder="tags (csv)" type="text"> 
         <input type="submit" value="Add">
