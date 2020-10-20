@@ -9,49 +9,45 @@
 </head>
 
 <body>
-    <h1>{{name}}'s Budget</h1>
-    <div>
-        <a href="/ledger"><button class="bold">Ledger</button></a>
-        <a href="/summary"><button>Summary</button></a>
-        <a href="/goals"><button>Goals</button></a>
-        <a href="/expected"><button>Expected</button></a>
-        <a href="/about"><button>About</button></a>
+    <div class="main">
+        <h1>{{name}}'s Budget</h1>
+        <form method="post" action="/transaction">
+            <input id="datePicker" name="when" placeholder="date" type="date">
+            <input required name="where" placeholder="where" type="text">
+            <input required name="amount" placeholder="amount" type="number" step="0.01">
+            <input name="category" placeholder="category" type="text">
+            <input name="subcategory" placeholder="tags (csv)" type="text">
+            <input type="submit" value="Add">
+        </form>
+        <table>
+            <tr>
+                <th></th>
+                <th>When</th>
+                <th>Where</th>
+                <th>Amount</th>
+                <th>Category</th>
+                <th>Tags</th>
+                <th></th>
+                <th></th>
+            </tr>
+            {{#each ledger}}
+            <tr>
+                <td>{{this.index}}</td>
+                <td>{{this.when}}</td>
+                <td>{{this.where}}</td>
+                <td>{{this.amount}}</td>
+                <td>{{this.category}}</td>
+                <td>{{this.subcategory}}</td>
+                <td><a href="/ledger/edit/{{this.id}}"><button>&#9881;</button></a></td>
+                <td><button onclick="remove({{this.id}})">X</button></td>
+            </tr>
+            {{/each}}
+        </table>
+        <script>
+            document.getElementById('datePicker').value = new Date().toLocaleDateString();
+        </script>
     </div>
-    <form method="post" action="/transaction">
-        <input id="datePicker" name="when" placeholder="date" type="date"> 
-        <input required name="where" placeholder="where" type="text"> 
-        <input required name="amount" placeholder="amount" type="number" step="0.01"> 
-        <input name="category" placeholder="category" type="text"> 
-        <input name="subcategory" placeholder="tags (csv)" type="text"> 
-        <input type="submit" value="Add">
-    </form>
-    <table>
-        <tr>
-            <th></th>
-            <th>When</th>
-            <th>Where</th>
-            <th>Amount</th>
-            <th>Category</th>
-            <th>Tags</th>
-            <th></th>
-            <th></th>
-        </tr>
-        {{#each ledger}}
-        <tr>
-            <td>{{this.index}}</td>
-            <td>{{this.when}}</td>
-            <td>{{this.where}}</td>
-            <td>{{this.amount}}</td>
-            <td>{{this.category}}</td>
-            <td>{{this.subcategory}}</td>
-            <td><a href="/ledger/edit/{{this.id}}"><button>&#9881;</button></a></td>
-            <td><button onclick="remove({{this.id}})">X</button></td>
-        </tr>
-        {{/each}}
-    </table>
-    <script>
-        document.getElementById('datePicker').value = new Date().toLocaleDateString();
-    </script>
+    {{> navigation}}
 </body>
-</html>
 
+</html>

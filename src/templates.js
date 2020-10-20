@@ -7,7 +7,13 @@ function loadTemplate(templates, name, filepath){
     templates[name] = handlebars.compile(templateContent);
 }
 
+function loadPartial(name, filepath){
+    handlebars.registerPartial(name, fs.readFileSync(filepath).toString());
+}
+
 function setUpTemplates(){
+    loadPartial("navigation", path.join(__dirname, "templates/navigation.html"))
+
     let templates = {};
     loadTemplate(templates, "about", path.join(__dirname, 'templates/about.html'))
     loadTemplate(templates, "login", path.join(__dirname, 'templates/login.html'))
@@ -17,7 +23,6 @@ function setUpTemplates(){
     loadTemplate(templates, "goals", path.join(__dirname, 'templates/goals.html'))
     loadTemplate(templates, "expected", path.join(__dirname, 'templates/expected.html'))
     loadTemplate(templates, "summary", path.join(__dirname, 'templates/summary.html'))
-
     return templates
 }
 

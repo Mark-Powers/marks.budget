@@ -7,11 +7,6 @@ table {
     max-width: 100%;
 }
 
-li {
-    cursor: pointer;
-    text-decoration: underline;
-}
-
 tr:nth-child(2n+1) {
     background-color: lightgray;
 }
@@ -43,17 +38,43 @@ pre {
 }
 
 .net-negative {
-    /* color: red; */
     background-color: lightcoral;
 }
 .net-positive {
-    /* color: green; */
     background-color: lightgreen
+}
+
+.summary {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
 }
 .summary-panel {
     float:left;
     padding-right: 2em;
 }
+
+body {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.navigation {
+    flex-grow: 1;
+    max-width: 100px;
+    border-left: 1px solid #333;
+    padding-left: 10px;
+}
+
+.main {
+    flex-grow: 3;
+    max-width: 1000px;
+}
+
+p, li {
+    max-width: 70ch;
+}
+
 @media only screen and (max-width: 600px) {
     .newItem td {
         display:block;
@@ -68,5 +89,8 @@ pre {
         font-size: 32px;
         display: block;
         width: 100%;
+    }
+    .navigation {
+        border-left: none;
     }
 }

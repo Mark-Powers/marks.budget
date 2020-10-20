@@ -8,128 +8,125 @@
 </head>
 
 <body>
-    <h1>{{name}}'s Budget</h1>
-    <div>
-        <a href="/ledger"><button>Ledger</button></a>
-        <a href="/summary"><button class="bold">Summary</button></a>
-        <a href="/goals"><button>Goals</button></a>
-        <a href="/expected"><button>Expected</button></a>
-        <a href="/about"><button>About</button></a>
+    <div class="main">
+        <h1>{{name}}'s Budget</h1>
+        <div class="summary">
+            <div class="summary-panel">
+                <h2>Weekly</h2>
+                <table class="table">
+                    <tr>
+                        <th>Year</th>
+                        <th>Week</th>
+                        <th>In</th>
+                        <th>Out</th>
+                        <th>Net</th>
+                    </tr>
+                    {{#each week}}
+                    <tr>
+                        <td>{{this.y}}</td>
+                        <td>{{this.w}}</td>
+                        <td>{{this.in}}</td>
+                        <td>{{this.out}}</td>
+                        <td class="{{this.classes}}">{{this.net}}</td>
+                    </tr>
+                    {{/each}}
+                    Avg:
+                    <tr>
+                        <td>Avg:</td>
+                        <td></td>
+                        <td>{{week_avg.in}}</td>
+                        <td>{{week_avg.out}}</td>
+                        <td class="{{week_avg.classes}}">{{week_avg.net}}</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="summary-panel">
+                <h2>Monthly</h2>
+                <table class="table">
+                    <tr>
+                        <th>Year</th>
+                        <th>Month</th>
+                        <th>In</th>
+                        <th>Out</th>
+                        <th>Net</th>
+                    </tr>
+                    {{#each month}}
+                    <tr>
+                        <td>{{this.y}}</td>
+                        <td>{{this.m}}</td>
+                        <td>{{this.in}}</td>
+                        <td>{{this.out}}</td>
+                        <td class="{{this.classes}}">{{this.net}}</td>
+                    </tr>
+                    {{/each}}
+                    <tr>
+                        <td>Avg:</td>
+                        <td></td>
+                        <td>{{month_avg.in}}</td>
+                        <td>{{month_avg.out}}</td>
+                        <td class="{{month_avg.classes}}">{{month_avg.net}}</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="summary-panel">
+                <h2>Yearly</h2>
+                <table class="table">
+                    <tr>
+                        <th>Year</th>
+                        <th>In</th>
+                        <th>Out</th>
+                        <th>Net</th>
+                    </tr>
+                    {{#each year}}
+                    <tr>
+                        <td>{{this.y}}</td>
+                        <td>{{this.in}}</td>
+                        <td>{{this.out}}</td>
+                        <td class="{{this.classes}}">{{this.net}}</td>
+                    </tr>
+                    {{/each}}
+                    Avg:
+                    <tr>
+                        <td>Avg:</td>
+                        <td>{{year_avg.in}}</td>
+                        <td>{{year_avg.out}}</td>
+                        <td class="{{year_avg.classes}}">{{year_avg.net}}</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="summary-panel">
+                <h2>Categories</h2>
+                <table class="table">
+                    <tr>
+                        <th>Category</th>
+                        <th>Total</th>
+                    </tr>
+                    {{#each categories}}
+                    <tr>
+                        <td>{{this.category}}</td>
+                        <td>{{this.s}}</td>
+                    </tr>
+                    {{/each}}
+                </table>
+            </div>
+            <div class="summary-panel">
+                <h2>Sub-Categories</h2>
+                <table class="table">
+                    <tr>
+                        <th>Sub-Category</th>
+                        <th>Total</th>
+                    </tr>
+                    {{#each subcategories}}
+                    <tr>
+                        <td>{{this.subcategory}}</td>
+                        <td>{{this.s}}</td>
+                    </tr>
+                    {{/each}}
+                </table>
+            </div>
+        </div>
     </div>
-
-    <div class="summary-panel">
-        <h2>Weekly</h2>
-        <table class="table">
-            <tr>
-                <th>Year</th>
-                <th>Week</th>
-                <th>In</th>
-                <th>Out</th>
-                <th>Net</th>
-            </tr>
-            {{#each week}}
-            <tr>
-                <td>{{this.y}}</td>
-                <td>{{this.w}}</td>
-                <td>{{this.in}}</td>
-                <td>{{this.out}}</td>
-                <td class="{{this.classes}}">{{this.net}}</td>
-            </tr>
-            {{/each}}
-            Avg:
-            <tr>
-                <td>Avg:</td>
-                <td></td>
-                <td>{{week_avg.in}}</td>
-                <td>{{week_avg.out}}</td>
-                <td class="{{week_avg.classes}}">{{week_avg.net}}</td>
-            </tr>
-        </table>
-    </div>
-    <div class="summary-panel">
-        <h2>Monthly</h2>
-        <table class="table">
-            <tr>
-                <th>Year</th>
-                <th>Month</th>
-                <th>In</th>
-                <th>Out</th>
-                <th>Net</th>
-            </tr>
-            {{#each month}}
-            <tr>
-                <td>{{this.y}}</td>
-                <td>{{this.m}}</td>
-                <td>{{this.in}}</td>
-                <td>{{this.out}}</td>
-                <td class="{{this.classes}}">{{this.net}}</td>
-            </tr>
-            {{/each}}
-            <tr>
-                <td>Avg:</td>
-                <td></td>
-                <td>{{month_avg.in}}</td>
-                <td>{{month_avg.out}}</td>
-                <td class="{{month_avg.classes}}">{{month_avg.net}}</td>
-            </tr>
-        </table>
-    </div>
-    <div class="summary-panel">
-        <h2>Yearly</h2>
-        <table class="table">
-            <tr>
-                <th>Year</th>
-                <th>In</th>
-                <th>Out</th>
-                <th>Net</th>
-            </tr>
-            {{#each year}}
-            <tr>
-                <td>{{this.y}}</td>
-                <td>{{this.in}}</td>
-                <td>{{this.out}}</td>
-                <td class="{{this.classes}}">{{this.net}}</td>
-            </tr>
-            {{/each}}
-            Avg:
-            <tr>
-                <td>Avg:</td>
-                <td>{{year_avg.in}}</td>
-                <td>{{year_avg.out}}</td>
-                <td class="{{year_avg.classes}}">{{year_avg.net}}</td>
-            </tr>
-        </table>
-    </div>
-    <div class="summary-panel">
-        <h2>Categories</h2>
-        <table class="table">
-            <tr>
-                <th>Category</th>
-                <th>Total</th>
-            </tr>
-            {{#each categories}}
-            <tr>
-                <td>{{this.category}}</td>
-                <td>{{this.s}}</td>
-            </tr>
-            {{/each}}
-        </table>
-    </div>
-    <div class="summary-panel">
-        <h2>Sub-Categories</h2>
-        <table class="table">
-            <tr>
-                <th>Sub-Category</th>
-                <th>Total</th>
-            </tr>
-            {{#each subcategories}}
-            <tr>
-                <td>{{this.subcategory}}</td>
-                <td>{{this.s}}</td>
-            </tr>
-            {{/each}}
-        </table>
-    </div>
+    {{> navigation}}
 </body>
 
 </html>

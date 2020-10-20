@@ -8,44 +8,54 @@
 </head>
 
 <body>
-    <h1>{{name}}'s Budget</h1>
-    <div>
-        <a href="/ledger"><button>Ledger</button></a>
-        <a href="/summary"><button>Summary</button></a>
-        <a href="/goals"><button>Goals</button></a>
-        <a href="/expected"><button class="bold">Expected</button></a>
-        <a href="/about"><button>About</button></a>
+    <div class="main">
+        <h1>{{name}}'s Budget</h1>
+        <div>
+            <a href="/ledger"><button>Ledger</button></a>
+            <a href="/summary"><button>Summary</button></a>
+            <a href="/goals"><button>Goals</button></a>
+            <a href="/expected"><button class="bold">Expected</button></a>
+            <a href="/about"><button>About</button></a>
+        </div>
+
+        <form method="post" action="/expected">
+            <input name="name" placeholder="name" type="text">
+            <input name="total" placeholder="total" type="number">
+            <input name="days" placeholder="days" type="number">
+            <input type="submit" value="Add">
+        </form>
+        <table>
+            <tr>
+                <th></th>
+                <th>Name</th>
+                <th>Total</th>
+                <th>Period</th>
+            </tr>
+            {{#each expecteds}}
+            <tr>
+                <td class="table-index">{{this.index}}</td>
+                <td>{{this.name}}</td>
+                <td>{{this.total}}</td>
+                <td>{{this.days}}</td>
+            </tr>
+            {{/each}}
+        </table>
+        <table>
+            <tr>
+                <td>Weekly:</td>
+                <td>{{week}}</td>
+            </tr>
+            <tr>
+                <td>Monthly:</td>
+                <td>{{month}}</td>
+            </tr>
+            <tr>
+                <td>Yearly:</td>
+                <td>{{year}}</td>
+            </tr>
+        </table>
     </div>
-
-    <form method="post" action="/expected">
-        <input name="name" placeholder="name" type="text">
-        <input name="total" placeholder="total" type="number">
-        <input name="days" placeholder="days" type="number">
-        <input type="submit" value="Add">
-    </form>
-    <table>
-        <tr><th></th><th>Name</th><th>Total</th><th>Period</th></tr>
-        {{#each expecteds}}
-        <tr>
-            <td class="table-index">{{this.index}}</td>
-            <td>{{this.name}}</td>
-            <td>{{this.total}}</td>
-            <td>{{this.days}}</td>
-        </tr>
-        {{/each}}
-    </table>
-    <table>
-        <tr>
-            <td>Weekly:</td>
-            <td>{{week}}</td>
-        </tr><tr>
-            <td>Monthly:</td>
-            <td>{{month}}</td>
-        </tr><tr>
-            <td>Yearly:</td>
-            <td>{{year}}</td>
-        </tr>
-    </table>
+    {{>navigation}}
 </body>
-</html>
 
+</html>

@@ -2,21 +2,14 @@
 <html lang="en">
 
 <head>
-    <title>Mark's Database - Login</title>
+    <title>About</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" type="text/css" href="/css/styles.css">
+    <link rel="stylesheet" type="text/css" href="static/styles.css">
 </head>
 
 <body>
-    <div>
-        <a href="/ledger"><button class="bold">Ledger</button></a>
-        <a href="/summary"><button>Summary</button></a>
-        <a href="/goals"><button>Goals</button></a>
-        <a href="/expected"><button>Expected</button></a>
-        <a href="/about"><button>About</button></a>
-    </div>
-    <div>
+    <div class="main">
         <h1>About</h1>
         <p>Welcome to the alpha budget app! You've been given exclusive access to this secret trial</p>
         <p>Here is how I use this site</p>
@@ -30,6 +23,7 @@
             <li><em>Goals</em> can be used to subdivide net savings into categories. It is still W.I.P.</li>
         </ol>
     </div>
+    {{> navigation}}
 </body>
 
 </html>

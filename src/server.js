@@ -67,6 +67,10 @@ function setUpRoutes(models, jwtFunctions, database, templates) {
         let body = templates["login"]({});
         res.status(200).send(body)
     })
+    server.get('/logout', (req, res) => {
+        res.clearCookie('authorization');
+        res.redirect("/login");
+    });
     server.get('/login/signup', async (req, res) => {
         let body = templates["signup"]({});
         res.status(200).send(body)
