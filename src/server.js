@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 //const request = require('request');
 const crypto = require('crypto');
+const uuidv4 = require('uuid/v4');
 
 const path = require('path');
 const fs = require('fs');
@@ -25,20 +26,32 @@ function hashWithSalt(password, salt) {
 
 let messages = {}
 function putMessage(message, res){
-    message[res.locals.username] = message;
+    console.debug("message put", res.locals.id, message)
+    messages[res.locals.id] = message;
 }
 function consumeMessage(res){
-    if(messages[res.locals.username]){
-        let t = messages[res.locals.username]
-        delete messages[res.locals.username]
+    let id = res.locals.id
+    if(messages[id]){
+        let t = messages[id]
+        console.debug("message consume", id, t)
+        delete messages[id]
         return t
+    } else {
+        console.debug("message consume", id, undefined)
+        return undefined
     }
-    return undefined
 }
 
 function setUpRoutes(models, jwtFunctions, database, templates) {
     // Authentication routine
     server.use(async function (req, res, next) {
+        let session_cookie = req.cookies.session;
+        if (!session_cookie) {
+            session_cookie = uuidv4();
+            res.cookie('session', session_cookie, { expires: new Date(Date.now() + (1000 * 60 * 60 * 30)) });
+        }
+        res.locals.id = session_cookie;
+
         let path = req.path.toLowerCase();
         if (!path.startsWith("/login")) {
             let cookie = req.cookies.authorization
@@ -83,15 +96,16 @@ function setUpRoutes(models, jwtFunctions, database, templates) {
         res.status(200).send(body)
     })
     server.get('/login', (req, res) => {
-        let body = templates["login"]({});
+        let body = templates["login"]({message: consumeMessage(res)});
         res.status(200).send(body)
     })
     server.get('/logout', (req, res) => {
+        putMessage("Logged out", res)
         res.clearCookie('authorization');
         res.redirect("/login");
     });
     server.get('/login/signup', async (req, res) => {
-        let body = templates["signup"]({});
+        let body = templates["signup"]({message: consumeMessage(res)});
         res.status(200).send(body)
     })
     server.get('/ledger', async (req, res) => {
@@ -150,31 +164,43 @@ function setUpRoutes(models, jwtFunctions, database, templates) {
             res.status(400).send(e.message);
         }
     })
-    
 
-
+    server.post('/password', async (req, res, next) => {
+        const user = await models.users.findOne({ where: { username: res.locals.user.username } })
+        const hash = hashWithSalt(req.body.old, user.salt)
+        if(hash != user.password){
+            putMessage("Old password incorrect", res)
+            res.redirect("/me");
+        } else if( req.body.new1 != req.body.new2){
+            putMessage("New passwords do not match", res)
+            res.redirect("/me");
+        } else {
+            await user.update({password: hash});
+            putMessage("Password updated", res);
+            res.redirect("/me");
+        }
+    })
     server.post('/login', async (req, res, next) => {
         const user = await models.users.findOne({ where: { username: req.body.username } })
         const hash = hashWithSalt(req.body.password, user.salt)
-        if (user.password == hash) {
+        if (!user || user.password != hash) {
+            putMessage("Username or password incorrect", res)
+            res.redirect('/login');
+        } else if (user.password == hash) {
             const token = jwtFunctions.sign(user.username);
             res.cookie('authorization', token, { expires: new Date(Date.now() + (1000 * 60 * 60 * 24 * 30)) });
-            console.debug("Redirecting to page - logged in")
             res.redirect('/ledger');
-        } else {
-            console.debug("Redirecting to login - invalid login")
-            res.redirect('/login');
         }
     })
     server.post('/login/signup', async (req, res) => {
         if(req.body.code != config.signup_code){
-            console.debug("Redirecting to signup - bad code")
+            putMessage("Bad code", res)
             res.redirect('/login/signup');
             return;
         }
         const user = await models.users.findOne({ where: { username: req.body.username } })
         if(user){
-            console.debug("Redirecting to signup - user already exists")
+            putMessage("Username already exists", res)
             res.redirect('/login/signup');
             return;
         }
@@ -187,7 +213,7 @@ function setUpRoutes(models, jwtFunctions, database, templates) {
             salt: salt
         }
         await models.users.create(new_user);
-        console.debug("Created account - log in")
+        putMessage("Account created, please log in")
         res.redirect("/login")
     })
     server.post(`/transaction`, async (req, res, next) => {

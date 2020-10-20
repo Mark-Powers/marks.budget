@@ -11,6 +11,7 @@
 <body>
     <div>
         <h1>Sign up!</h1>
+        {{>message}}
         <form method="post" action="/login/signup">
             <input name="username" type="text" placeholder="Enter Username" required>
             <input type="password" placeholder="Enter Password" name="password" required>
@@ -18,6 +19,7 @@
             <input type="submit" vallue="Log in"> 
         </div>
     </div>
+    <a href="/login">or login</a>
 </body>
 
 </html>
