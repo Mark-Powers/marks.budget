@@ -69,13 +69,18 @@ body {
 .main {
     flex-grow: 3;
     max-width: 1000px;
+    margin: auto;
 }
 
 p, li {
     max-width: 70ch;
 }
 
-@media only screen and (max-width: 600px) {
+a, a:visited {
+    color: black;
+}
+
+@media (max-width: 600px) {
     .newItem td {
         display:block;
     }

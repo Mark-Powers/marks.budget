@@ -29,4 +29,4 @@ fill out a `config.json` file as specified below, and then `npm run run`.
     - Add initial balance somewhere
     - Reset password
 - Add admin page
-- Add signup page with code needed
+- Add messages

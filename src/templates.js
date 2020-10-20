@@ -13,8 +13,10 @@ function loadPartial(name, filepath){
 
 function setUpTemplates(){
     loadPartial("navigation", path.join(__dirname, "templates/navigation.html"))
+    loadPartial("message", path.join(__dirname, "templates/message.html"))
 
     let templates = {};
+    loadTemplate(templates, "me", path.join(__dirname, 'templates/me.html'))
     loadTemplate(templates, "about", path.join(__dirname, 'templates/about.html'))
     loadTemplate(templates, "login", path.join(__dirname, 'templates/login.html'))
     loadTemplate(templates, "signup", path.join(__dirname, 'templates/sign-up.html'))

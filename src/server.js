@@ -23,6 +23,19 @@ function hashWithSalt(password, salt) {
     return hash.digest("base64");
 };
 
+let messages = {}
+function putMessage(message, res){
+    message[res.locals.username] = message;
+}
+function consumeMessage(res){
+    if(messages[res.locals.username]){
+        let t = messages[res.locals.username]
+        delete messages[res.locals.username]
+        return t
+    }
+    return undefined
+}
+
 function setUpRoutes(models, jwtFunctions, database, templates) {
     // Authentication routine
     server.use(async function (req, res, next) {
@@ -60,7 +73,13 @@ function setUpRoutes(models, jwtFunctions, database, templates) {
     server.use('/static', express.static(path.join(__dirname, '/static')))
     server.get('/', (req, res) => res.redirect("/ledger"))
     server.get('/about', (req, res) => {
-        let body = templates["about"]({});
+        let name = res.locals.user.username
+        let body = templates["about"]({name});
+        res.status(200).send(body)
+    })
+    server.get('/me', (req, res) => {
+        let name = res.locals.user.username
+        let body = templates["me"]({name, message: consumeMessage(res)});
         res.status(200).send(body)
     })
     server.get('/login', (req, res) => {
