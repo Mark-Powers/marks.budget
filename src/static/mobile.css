@@ -1,0 +1,36 @@
+@media (max-width: 1000px) {
+    body {
+        display: block;
+    }
+    .newItem td {
+        display:block;
+    }
+    table{
+        width: 100%;
+    }
+    h1, button, input {
+        font-size: 72px;
+    }
+    h2, .navigation {
+        font-size: 64px;
+    }
+    td, p, li {
+        font-size: 36px;
+    }
+    input {
+        font-size: 72px;
+        display: block;
+        width: 95%;
+    }
+    .navigation {
+        border-left: none;
+        display: inline;
+        
+    }
+    .navigation h2, .navigation div {
+        display: inline;
+    }
+    .table-index {
+        display: none;
+    }
+}

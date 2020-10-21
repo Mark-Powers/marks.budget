@@ -41,6 +41,9 @@ function consumeMessage(res){
         return undefined
     }
 }
+function dateToString(d){
+    return `${d.getFullYear().toString()}/${d.getMonth().toString()}/${d.getDate().toString()}`
+}
 
 function setUpRoutes(models, jwtFunctions, database, templates) {
     // Authentication routine
@@ -53,6 +56,10 @@ function setUpRoutes(models, jwtFunctions, database, templates) {
         res.locals.id = session_cookie;
 
         let path = req.path.toLowerCase();
+        if(path.startsWith("/static")){
+            next();
+            return;
+        }
         if (!path.startsWith("/login")) {
             let cookie = req.cookies.authorization
             if (!cookie) {
@@ -111,7 +118,7 @@ function setUpRoutes(models, jwtFunctions, database, templates) {
     server.get('/ledger', async (req, res) => {
         var ledger = await database.query(`SELECT * FROM transactions WHERE username = '${res.locals.user.username}' ORDER BY \`when\` DESC`, { type: database.QueryTypes.SELECT })
         ledger.forEach((element, i) => {
-            element.when = element.when.toString().substring(0, 10);
+            element.when = dateToString(element.when);
             element.index = i + 1
         });
         let name = res.locals.user.username

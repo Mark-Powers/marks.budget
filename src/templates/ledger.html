@@ -4,8 +4,8 @@
 <head>
     <title>{{name}}'s Budget</title>
     <meta charset="UTF-8">
-    <link rel="stylesheet" type="text/css" href="static/styles.css">
-    <script src="/static/main.js"></script>
+    {{> styles}}
+    <script src="static/main.js"></script>
 </head>
 
 <body>
@@ -21,7 +21,7 @@
         </form>
         <table>
             <tr>
-                <th></th>
+                <th class="table-index"></th>
                 <th>When</th>
                 <th>Where</th>
                 <th>Amount</th>
@@ -32,7 +32,7 @@
             </tr>
             {{#each ledger}}
             <tr>
-                <td>{{this.index}}</td>
+                <td class="table-index">{{this.index}}</td>
                 <td>{{this.when}}</td>
                 <td>{{this.where}}</td>
                 <td>{{this.amount}}</td>

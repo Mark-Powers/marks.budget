@@ -14,6 +14,7 @@ function loadPartial(name, filepath){
 function setUpTemplates(){
     loadPartial("navigation", path.join(__dirname, "templates/navigation.html"))
     loadPartial("message", path.join(__dirname, "templates/message.html"))
+    loadPartial("styles", path.join(__dirname, "templates/styles.html"))
 
     let templates = {};
     loadTemplate(templates, "me", path.join(__dirname, 'templates/me.html'))

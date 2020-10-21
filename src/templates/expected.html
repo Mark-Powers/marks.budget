@@ -4,20 +4,12 @@
 <head>
     <title>{{name}}'s Budget</title>
     <meta charset="UTF-8">
-    <link rel="stylesheet" type="text/css" href="static/styles.css">
+    {{> styles}}
 </head>
 
 <body>
     <div class="main">
         <h1>Expected</h1>
-        <div>
-            <a href="/ledger"><button>Ledger</button></a>
-            <a href="/summary"><button>Summary</button></a>
-            <a href="/goals"><button>Goals</button></a>
-            <a href="/expected"><button class="bold">Expected</button></a>
-            <a href="/about"><button>About</button></a>
-        </div>
-
         <form method="post" action="/expected">
             <input name="name" placeholder="name" type="text">
             <input name="total" placeholder="total" type="number">
