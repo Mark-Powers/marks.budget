@@ -11,10 +11,10 @@ fill out a `config.json` file as specified below, and then `npm run run`.
 ```
 {
     "database": {
-        "host": "<DB_HOST>",
-        "user": "<DB_USER>",
-        "database": "<DB_NAME>",
-        "password": "<PASSWORD>"
+        "host": "DB_HOST",
+        "user": "DB_USER",
+        "database": "DB_NAME",
+        "password": "PASSWORD"
     },
     "port": <PORT_TO_RUN_WEBSERVER_ON>
 }
