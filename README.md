@@ -16,7 +16,7 @@ fill out a `config.json` file as specified below, and then `npm run run`.
         "database": "DB_NAME",
         "password": "PASSWORD"
     },
-    "port": <PORT_TO_RUN_WEBSERVER_ON>
+    "port": PORT_TO_RUN_WEBSERVER_ON
 }
 
 ```
