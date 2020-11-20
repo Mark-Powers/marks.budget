@@ -145,15 +145,34 @@ function setUpRoutes(models, jwtFunctions, database, templates) {
     server.get(`/expected`, async (req, res, next) => {
         try {
             let expecteds = await database.query(`SELECT * FROM expecteds WHERE username = '${res.locals.user.username}' ORDER BY \`name\` DESC`, { type: database.QueryTypes.SELECT })
-            let day_average = 0
+            let day_in = 0
+            let day_out = 0
             expecteds.forEach((element, i) => {
                 element.index = i + 1
-                day_average += (element.total / element.days)
+                let day = (element.total / element.days)
+                if(day < 0) { // negative since that is income
+                    day_in += day;
+                } else {
+                    day_out += day;
+                }
             });
+            let day_net = day_in + day_out;
             let name = res.locals.user.username
-            let week = Math.round(day_average * 7)
-            let month = Math.round(day_average * 31)
-            let year = Math.round(day_average * 365)
+            let week = {
+                net: Math.round(day_net * 7),
+                in: Math.round(day_in * 7),
+                out: Math.round(day_out * 7),
+            }
+            let month = {
+                net: Math.round(day_net * 31),
+                in: Math.round(day_in * 31),
+                out: Math.round(day_out * 31),
+            }
+            let year = {
+                net: Math.round(day_net * 365),
+                in: Math.round(day_in * 365),
+                out: Math.round(day_out * 365),
+            }
             let body = templates["expected"]({ name, expecteds, week, month, year })
             res.status(200).send(body);
         } catch (e) {
