@@ -99,12 +99,18 @@
                 <table class="table">
                     <tr>
                         <th>Category</th>
-                        <th>Total</th>
+                        <th>Last 30 days</th>
+                        <th>Last 90 days</th>
+                        <th>Last year</th>
+                        <th>All-time</th>
                     </tr>
                     {{#each categories}}
                     <tr>
                         <td>{{this.category}}</td>
-                        <td>{{this.s}}</td>
+                        <td>{{this.d30}}</td>
+                        <td>{{this.d90}}</td>
+                        <td>{{this.d365}}</td>
+                        <td>{{this.all}}</td>
                     </tr>
                     {{/each}}
                 </table>
@@ -114,12 +120,18 @@
                 <table class="table">
                     <tr>
                         <th>Sub-Category</th>
-                        <th>Total</th>
+                        <th>Last 30 days</th>
+                        <th>Last 90 days</th>
+                        <th>Last year</th>
+                        <th>All-time</th>
                     </tr>
                     {{#each subcategories}}
                     <tr>
                         <td>{{this.subcategory}}</td>
-                        <td>{{this.s}}</td>
+                        <td>{{this.d30}}</td>
+                        <td>{{this.d90}}</td>
+                        <td>{{this.d365}}</td>
+                        <td>{{this.all}}</td>
                     </tr>
                     {{/each}}
                 </table>

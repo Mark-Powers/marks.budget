@@ -117,9 +117,42 @@ async function formatSummary(database, username) {
     summary.month_avg = getBudgetAverage(summary.month)
     summary.week_avg = getBudgetAverage(summary.week)
 
+    let categories = await database.query(`select category, sum(amount) as s from transactions where username = '${username}' and category <> '' group by category`, { type: database.QueryTypes.SELECT });
+    let categories_30day = await database.query(`select category, sum(amount) as s from transactions where username = '${username}' and category <> '' and createdAt BETWEEN DATE_SUB(NOW(), INTERVAL 30 DAY) and NOW() group by category`, { type: database.QueryTypes.SELECT });
+    let categories_90day = await database.query(`select category, sum(amount) as s from transactions where username = '${username}' and category <> '' and createdAt BETWEEN DATE_SUB(NOW(), INTERVAL 90 DAY) and NOW() group by category`, { type: database.QueryTypes.SELECT });
+    let categories_365day = await database.query(`select category, sum(amount) as s from transactions where username = '${username}' and category <> '' and createdAt BETWEEN DATE_SUB(NOW(), INTERVAL 365 DAY) and NOW() group by category`, { type: database.QueryTypes.SELECT });
+    summary.categories = {}
+    categories.forEach(el => {
+        summary.categories[el.category] = {category: el.category, all: el.s, d30: 0, d90: 0}
+    })
+    categories_30day.forEach(el => {
+        summary.categories[el.category].d30 = el.s
+    })
+    categories_90day.forEach(el => {
+        summary.categories[el.category].d90 = el.s
+    })
+    categories_365day.forEach(el => {
+        summary.categories[el.category].d365 = el.s
+    })
 
-    summary.categories = await database.query(`select category, sum(amount) as s from transactions where username = '${username}' and category <> '' group by category`, { type: database.QueryTypes.SELECT });
-    summary.subcategories = await database.query(`select subcategory, sum(amount) as s from transactions where username = '${username}' and subcategory <> '' group by subcategory`, { type: database.QueryTypes.SELECT });
+    let subcategories = await database.query(`select subcategory, sum(amount) as s from transactions where username = '${username}' and subcategory <> '' group by subcategory`, { type: database.QueryTypes.SELECT });
+    let subcategories_30day = await database.query(`select subcategory, sum(amount) as s from transactions where username = '${username}' and subcategory <> '' and createdAt BETWEEN DATE_SUB(NOW(), INTERVAL 30 DAY) and NOW() group by subcategory`, { type: database.QueryTypes.SELECT });
+    let subcategories_90day = await database.query(`select subcategory, sum(amount) as s from transactions where username = '${username}' and subcategory <> '' and createdAt BETWEEN DATE_SUB(NOW(), INTERVAL 90 DAY) and NOW() group by subcategory`, { type: database.QueryTypes.SELECT });
+    let subcategories_365day = await database.query(`select subcategory, sum(amount) as s from transactions where username = '${username}' and subcategory <> '' and createdAt BETWEEN DATE_SUB(NOW(), INTERVAL 365 DAY) and NOW() group by subcategory`, { type: database.QueryTypes.SELECT });
+    summary.subcategories = {}
+    subcategories.forEach(el => {
+        summary.subcategories[el.subcategory] = {subcategory: el.subcategory, all: el.s, d30: 0, d90: 0}
+    })
+    subcategories_30day.forEach(el => {
+        summary.subcategories[el.subcategory].d30 = el.s
+    })
+    subcategories_90day.forEach(el => {
+        summary.subcategories[el.subcategory].d90 = el.s
+    })
+    subcategories_365day.forEach(el => {
+        summary.subcategories[el.subcategory].d365 = el.s
+    })
+
     summary.name = username
     return summary
 }
