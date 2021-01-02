@@ -42,7 +42,7 @@ function consumeMessage(res){
     }
 }
 function dateToString(d){
-    return `${d.getFullYear().toString()}/${d.getMonth().toString()}/${d.getDate().toString()}`
+    return `${d.getFullYear().toString()}/${(d.getMonth()+1).toString()}/${d.getDate().toString()}`
 }
 
 function setUpRoutes(models, jwtFunctions, database, templates) {

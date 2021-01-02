@@ -126,13 +126,19 @@ async function formatSummary(database, username) {
         summary.categories[el.category] = {category: el.category, all: el.s, d30: 0, d90: 0, d365: 0 }
     })
     categories_30day.forEach(el => {
-        summary.categories[el.category].d30 = el.s
+        if(summary.categories[el.category]){
+            summary.categories[el.category].d30 = el.s
+        }
     })
     categories_90day.forEach(el => {
-        summary.categories[el.category].d90 = el.s
+        if(summary.categories[el.category]){
+            summary.categories[el.category].d90 = el.s
+        }
     })
     categories_365day.forEach(el => {
-        summary.categories[el.category].d365 = el.s
+        if(summary.categories[el.category]){
+            summary.categories[el.category].d365 = el.s
+        }
     })
 
     let subcategories = await database.query(`select subcategory, sum(amount) as s from transactions where username = '${username}' and subcategory <> '' group by subcategory`, { type: database.QueryTypes.SELECT });
